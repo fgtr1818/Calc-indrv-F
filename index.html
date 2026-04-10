@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador RUT Chile</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --card: #161920;
+    --card2: #1c1f29;
+    --border: #2a2d3a;
+    --accent: #4fd1c5;
+    --accent2: #38bdf8;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --text: #e8eaf0;
+    --muted: #6b7280;
+    --label: #9ca3af;
+  }
+
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+background: var(–bg);
+font-family: ‘Syne’, sans-serif;
+color: var(–text);
+min-height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 24px 16px;
+}
+
+.container {
+width: 100%;
+max-width: 420px;
+}
+
+/* HEADER */
+.header {
+text-align: center;
+margin-bottom: 24px;
+animation: fadeDown 0.5s ease both;
+}
+
+.header .badge {
+display: inline-block;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+color: #0d0f14;
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+padding: 4px 12px;
+border-radius: 20px;
+margin-bottom: 10px;
+}
+
+.header h1 {
+font-size: 26px;
+font-weight: 800;
+background: linear-gradient(135deg, var(–accent) 0%, var(–accent2) 100%);
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+background-clip: text;
+line-height: 1.2;
+}
+
+.header p {
+color: var(–muted);
+font-size: 13px;
+margin-top: 6px;
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+/* CARD */
+.card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 22px 20px;
+margin-bottom: 12px;
+animation: fadeUp 0.5s ease both;
+}
+
+.card-title {
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 14px;
+}
+
+/* INPUT */
+.input-group {
+display: flex;
+gap: 10px;
+align-items: stretch;
+}
+
+.rut-input {
+flex: 1;
+background: var(–card2);
+border: 1.5px solid var(–border);
+border-radius: 10px;
+padding: 14px 16px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 20px;
+font-weight: 600;
+color: var(–text);
+outline: none;
+transition: border-color 0.2s, box-shadow 0.2s;
+letter-spacing: 2px;
+width: 100%;
+}
+
+.rut-input::placeholder {
+color: var(–muted);
+font-size: 14px;
+letter-spacing: 0;
+}
+
+.rut-input:focus {
+border-color: var(–accent);
+box-shadow: 0 0 0 3px rgba(79,209,197,0.12);
+}
+
+.btn-calc {
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+color: #0d0f14;
+border: none;
+border-radius: 10px;
+padding: 0 20px;
+font-family: ‘Syne’, sans-serif;
+font-size: 13px;
+font-weight: 800;
+letter-spacing: 1px;
+cursor: pointer;
+transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+white-space: nowrap;
+text-transform: uppercase;
+}
+
+.btn-calc:hover {
+transform: translateY(-1px);
+box-shadow: 0 6px 20px rgba(79,209,197,0.35);
+}
+
+.btn-calc:active {
+transform: translateY(0);
+}
+
+/* HINT */
+.hint {
+font-size: 11px;
+color: var(–muted);
+margin-top: 10px;
+font-family: ‘JetBrains Mono’, monospace;
+text-align: center;
+}
+
+/* RESULTADO */
+.resultado-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 22px 20px;
+animation: fadeUp 0.4s ease both;
+display: none;
+}
+
+.resultado-card.visible {
+display: block;
+}
+
+.resultado-card.valido {
+border-color: rgba(74,222,128,0.35);
+}
+
+.resultado-card.invalido {
+border-color: rgba(248,113,113,0.35);
+}
+
+.res-header {
+display: flex;
+align-items: center;
+gap: 10px;
+margin-bottom: 16px;
+}
+
+.res-icon {
+width: 36px;
+height: 36px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 18px;
+flex-shrink: 0;
+}
+
+.res-icon.ok  { background: rgba(74,222,128,0.15); }
+.res-icon.err { background: rgba(248,113,113,0.15); }
+
+.res-label {
+font-size: 11px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+}
+
+.res-status {
+font-size: 15px;
+font-weight: 700;
+}
+
+.res-status.ok  { color: var(–green); }
+.res-status.err { color: var(–red); }
+
+.rut-display {
+background: var(–card2);
+border-radius: 10px;
+padding: 14px 18px;
+margin-bottom: 14px;
+text-align: center;
+}
+
+.rut-display .rut-num {
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 28px;
+font-weight: 600;
+letter-spacing: 3px;
+}
+
+.rut-display .rut-num .dv-ok  { color: var(–green); }
+.rut-display .rut-num .dv-err { color: var(–red); }
+.rut-display .rut-num .dv-neu { color: var(–accent); }
+
+.rut-display .rut-sub {
+font-size: 11px;
+color: var(–muted);
+font-family: ‘JetBrains Mono’, monospace;
+margin-top: 4px;
+}
+
+/* DESGLOSE */
+.desglose-title {
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 10px;
+}
+
+.desglose-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 7px 0;
+border-bottom: 1px solid var(–border);
+font-size: 13px;
+}
+
+.desglose-row:last-child { border-bottom: none; }
+
+.desglose-row .dlabel { color: var(–label); }
+
+.desglose-row .dval {
+font-family: ‘JetBrains Mono’, monospace;
+font-weight: 600;
+color: var(–text);
+}
+
+.dv-correcto { color: var(–green) !important; }
+.dv-incorrecto { color: var(–red) !important; }
+
+/* FÓRMULA */
+.formula-box {
+background: var(–card2);
+border-radius: 10px;
+padding: 12px 14px;
+margin-top: 14px;
+font-family: ‘JetBrains Mono’, monospace;
+font-size: 11px;
+color: var(–muted);
+line-height: 1.8;
+}
+
+.formula-box .fline { color: var(–label); }
+.formula-box .facent { color: var(–accent); }
+
+/* SII CARD */
+.sii-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 22px 20px;
+margin-bottom: 12px;
+display: none;
+animation: fadeUp 0.4s ease both;
+}
+
+.sii-card.visible { display: block; }
+
+.sii-loading {
+display: flex;
+align-items: center;
+gap: 10px;
+color: var(–muted);
+font-size: 13px;
+font-family: ‘JetBrains Mono’, monospace;
+}
+
+.spinner {
+width: 18px; height: 18px;
+border: 2px solid var(–border);
+border-top-color: var(–accent);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+flex-shrink: 0;
+}
+
+@keyframes spin {
+to { transform: rotate(360deg); }
+}
+
+.sii-resultado {
+display: none;
+}
+
+.sii-resultado.visible { display: block; }
+
+.sii-row {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+padding: 8px 0;
+border-bottom: 1px solid var(–border);
+font-size: 13px;
+gap: 12px;
+}
+
+.sii-row:last-child { border-bottom: none; }
+.sii-row .dlabel { color: var(–label); flex-shrink: 0; }
+.sii-row .dval {
+font-family: ‘JetBrains Mono’, monospace;
+font-weight: 600;
+color: var(–text);
+text-align: right;
+word-break: break-word;
+}
+
+.sii-error {
+display: none;
+background: var(–card2);
+border-radius: 10px;
+padding: 14px;
+text-align: center;
+}
+
+.sii-error.visible { display: block; }
+
+.sii-error p {
+color: var(–muted);
+font-size: 12px;
+font-family: ‘JetBrains Mono’, monospace;
+margin-bottom: 12px;
+line-height: 1.6;
+}
+
+.btn-sii {
+display: inline-block;
+background: linear-gradient(135deg, var(–accent), var(–accent2));
+color: #0d0f14;
+border: none;
+border-radius: 10px;
+padding: 10px 20px;
+font-family: ‘Syne’, sans-serif;
+font-size: 12px;
+font-weight: 800;
+letter-spacing: 1px;
+cursor: pointer;
+text-decoration: none;
+text-transform: uppercase;
+transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.btn-sii:hover {
+transform: translateY(-1px);
+box-shadow: 0 6px 20px rgba(79,209,197,0.35);
+}
+
+/* LINKS EXTERNOS */
+.links-card {
+background: var(–card);
+border: 1px solid var(–border);
+border-radius: 16px;
+padding: 22px 20px;
+margin-bottom: 12px;
+display: none;
+animation: fadeUp 0.5s ease both;
+}
+
+.links-card.visible { display: block; }
+
+.links-section-title {
+font-size: 10px;
+font-weight: 700;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–accent);
+margin: 14px 0 8px;
+}
+
+.links-section-title:first-child { margin-top: 0; }
+
+.links-grid {
+display: flex;
+flex-direction: column;
+gap: 6px;
+margin-bottom: 4px;
+}
+
+.link-btn {
+display: flex;
+align-items: center;
+justify-content: space-between;
+background: var(–card2);
+border: 1px solid var(–border);
+border-radius: 10px;
+padding: 10px 14px;
+text-decoration: none;
+color: var(–text);
+font-size: 13px;
+font-weight: 600;
+transition: border-color 0.15s, background 0.15s, transform 0.1s;
+cursor: pointer;
+}
+
+.link-btn:hover {
+border-color: var(–accent);
+background: #1f2535;
+transform: translateX(2px);
+}
+
+.link-btn .link-icon {
+font-size: 15px;
+margin-right: 10px;
+flex-shrink: 0;
+}
+
+.link-btn .link-text { flex: 1; }
+
+.link-btn .link-arrow {
+color: var(–muted);
+font-size: 11px;
+flex-shrink: 0;
+margin-left: 8px;
+}
+
+/* ANIMACIONES */
+@keyframes fadeDown {
+from { opacity: 0; transform: translateY(-12px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(14px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+.pulse {
+animation: pulse 0.3s ease;
+}
+
+@keyframes pulse {
+0%   { transform: scale(1); }
+50%  { transform: scale(1.03); }
+100% { transform: scale(1); }
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="badge">SII · Chile</div>
+    <h1>Validador de RUT</h1>
+    <p>Módulo 11 — Dígito verificador</p>
+  </div>
+
+  <!-- INPUT CARD -->
+
+  <div class="card">
+    <div class="card-title">Ingresa el RUT</div>
+    <div class="input-group">
+      <input
+        class="rut-input"
+        id="rutInput"
+        type="text"
+        placeholder="Ej: 18002710-6"
+        maxlength="12"
+        autocomplete="off"
+        inputmode="numeric"
+      />
+      <button class="btn-calc" onclick="calcular()">Calcular</button>
+    </div>
+    <div class="hint">Puedes ingresar solo el número base o con dígito verificador</div>
+  </div>
+
+  <!-- RESULTADO -->
+
+  <div class="resultado-card" id="resultadoCard">
+
+```
+<div class="res-header">
+  <div class="res-icon" id="resIcon"></div>
+  <div>
+    <div class="res-label">Resultado</div>
+    <div class="res-status" id="resStatus"></div>
+  </div>
+</div>
+
+<div class="rut-display">
+  <div class="rut-num" id="rutDisplay"></div>
+  <div class="rut-sub" id="rutSub"></div>
+</div>
+
+<div class="desglose-title">Desglose</div>
+
+<div class="desglose-row">
+  <span class="dlabel">RUT base</span>
+  <span class="dval" id="dBase"></span>
+</div>
+<div class="desglose-row">
+  <span class="dlabel">DV calculado</span>
+  <span class="dval" id="dCalc"></span>
+</div>
+<div class="desglose-row">
+  <span class="dlabel">DV ingresado</span>
+  <span class="dval" id="dIngresado"></span>
+</div>
+<div class="desglose-row">
+  <span class="dlabel">Suma ponderada</span>
+  <span class="dval" id="dSuma"></span>
+</div>
+<div class="desglose-row">
+  <span class="dlabel">Resto (suma % 11)</span>
+  <span class="dval" id="dResto"></span>
+</div>
+
+<div class="formula-box" id="formulaBox"></div>
+```
+
+  </div>
+
+  <!-- SII CARD -->
+
+  <div class="sii-card" id="siiCard">
+    <div class="card-title">Situación Tributaria · SII</div>
+
+```
+<div class="sii-loading" id="siiLoading">
+  <div class="spinner"></div>
+  <span>Consultando SII...</span>
+</div>
+
+<div class="sii-resultado" id="siiResultado">
+  <div class="sii-row">
+    <span class="dlabel">Nombre / Razón Social</span>
+    <span class="dval" id="siiNombre">—</span>
+  </div>
+  <div class="sii-row">
+    <span class="dlabel">Actividad</span>
+    <span class="dval" id="siiActividad">—</span>
+  </div>
+  <div class="sii-row">
+    <span class="dlabel">Inicio actividades</span>
+    <span class="dval" id="siiInicio">—</span>
+  </div>
+  <div class="sii-row">
+    <span class="dlabel">Situación tributaria</span>
+    <span class="dval" id="siiSituacion">—</span>
+  </div>
+</div>
+
+<div class="sii-error" id="siiError">
+  <p id="siiErrorMsg">El SII bloquea consultas directas desde apps externas (CORS).<br>Abre el sitio oficial con el RUT ya ingresado:</p>
+  <a id="siiFallbackBtn" href="#" target="_blank" class="btn-sii">Consultar en SII →</a>
+</div>
+```
+
+  </div>
+
+  <!-- LINKS EXTERNOS -->
+
+  <div class="links-card" id="linksCard">
+    <div class="card-title">Consultas Externas</div>
+
+```
+<div class="links-section-title">👤 Identificación</div>
+<div class="links-grid">
+  <a class="link-btn" id="lnk-buscarut" href="#" target="_blank">
+    <span class="link-icon">🔍</span><span class="link-text">BuscaRut</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-rutrutificadr" href="#" target="_blank">
+    <span class="link-icon">🪪</span><span class="link-text">RutRutificadr</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-nombrerut" href="#" target="_blank">
+    <span class="link-icon">📋</span><span class="link-text">Nombre, RUT y Firma</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-servel" href="#" target="_blank">
+    <span class="link-icon">🗳️</span><span class="link-text">SERVEL · Registro Electoral</span><span class="link-arrow">↗</span>
+  </a>
+</div>
+
+<div class="links-section-title">🏥 Salud y Previsión</div>
+<div class="links-grid">
+  <a class="link-btn" id="lnk-fonasa1" href="#" target="_blank">
+    <span class="link-icon">🏥</span><span class="link-text">FONASA · Cliente DPP</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-fonasa2" href="#" target="_blank">
+    <span class="link-icon">📄</span><span class="link-text">FONASA · Certificado RUT Provisorio</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-fonasa3" href="#" target="_blank">
+    <span class="link-icon">📑</span><span class="link-text">FONASA · Certificado Previsional</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-spensiones" href="#" target="_blank">
+    <span class="link-icon">💰</span><span class="link-text">SP · Consulta Afiliación</span><span class="link-arrow">↗</span>
+  </a>
+</div>
+
+<div class="links-section-title">🏢 SII · Impuestos</div>
+<div class="links-grid">
+  <a class="link-btn" id="lnk-ibero" href="#" target="_blank">
+    <span class="link-icon">📊</span><span class="link-text">Ibero Capital · Consulta SII</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-roles" href="#" target="_blank">
+    <span class="link-icon">🏠</span><span class="link-text">SII · Búsqueda de Roles</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-mapas" href="#" target="_blank">
+    <span class="link-icon">🗺️</span><span class="link-text">SII · Mapas de Propiedades</span><span class="link-arrow">↗</span>
+  </a>
+</div>
+
+<div class="links-section-title">🚗 Vehículos y Patentes</div>
+<div class="links-grid">
+  <a class="link-btn" id="lnk-patente" href="#" target="_blank">
+    <span class="link-icon">🚘</span><span class="link-text">Patente Chile</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-volantemaleta" href="#" target="_blank">
+    <span class="link-icon">🧳</span><span class="link-text">Volante o Maleta</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-alertavehiculo" href="#" target="_blank">
+    <span class="link-icon">🔔</span><span class="link-text">Alerta Vehículo</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-rrvv" href="#" target="_blank">
+    <span class="link-icon">🛣️</span><span class="link-text">MTT · Registro Vías</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-revision" href="#" target="_blank">
+    <span class="link-icon">🔧</span><span class="link-text">PRT · Revisión Técnica</span><span class="link-arrow">↗</span>
+  </a>
+</div>
+
+<div class="links-section-title">⚖️ Multas y Licencias</div>
+<div class="links-grid">
+  <a class="link-btn" id="lnk-multas" href="#" target="_blank">
+    <span class="link-icon">📝</span><span class="link-text">Consulta Multas SRCEI</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-licencia" href="#" target="_blank">
+    <span class="link-icon">🪪</span><span class="link-text">Registro Civil · Bloqueo Licencia</span><span class="link-arrow">↗</span>
+  </a>
+  <a class="link-btn" id="lnk-tag" href="#" target="_blank">
+    <span class="link-icon">🏷️</span><span class="link-text">Pasaste sin TAG</span><span class="link-arrow">↗</span>
+  </a>
+</div>
+```
+
+  </div>
+
+</div>
+
+<script>
+  // Formateo automático mientras escribe
+  document.getElementById('rutInput').addEventListener('input', function () {
+    let v = this.value.replace(/[^0-9kK\-]/g, '');
+    this.value = v;
+  });
+
+  document.getElementById('rutInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') calcular();
+  });
+
+  function calcularDV(rutBase) {
+    const digits = String(rutBase).split('').reverse();
+    const seq = [2, 3, 4, 5, 6, 7];
+    let suma = 0;
+    const detalle = [];
+
+    digits.forEach((d, i) => {
+      const factor = seq[i % 6];
+      const prod = parseInt(d) * factor;
+      suma += prod;
+      detalle.push(`${d}×${factor}=${prod}`);
+    });
+
+    const resto = suma % 11;
+    const res = 11 - resto;
+
+    let dv;
+    if (res === 11) dv = '0';
+    else if (res === 10) dv = 'K';
+    else dv = String(res);
+
+    return { dv, suma, resto, detalle: detalle.reverse() };
+  }
+
+  function formatRUT(num) {
+    const s = String(num);
+    if (s.length <= 3) return s;
+    let out = '';
+    let cnt = 0;
+    for (let i = s.length - 1; i >= 0; i--) {
+      if (cnt > 0 && cnt % 3 === 0) out = '.' + out;
+      out = s[i] + out;
+      cnt++;
+    }
+    return out;
+  }
+
+  function calcular() {
+    const raw = document.getElementById('rutInput').value.trim().replace(/\./g, '');
+    const card = document.getElementById('resultadoCard');
+
+    if (!raw) {
+      shake();
+      return;
+    }
+
+    // Separar base y DV si viene con guion
+    let base, dvIngresado = null;
+    if (raw.includes('-')) {
+      const parts = raw.split('-');
+      base = parts[0];
+      dvIngresado = parts[1].toUpperCase();
+    } else {
+      // Si el último char es K o el string tiene más de 1 char, podría ser solo base
+      base = raw;
+    }
+
+    base = base.replace(/\D/g, '');
+
+    if (!base || isNaN(base) || parseInt(base) < 100000) {
+      mostrarError('RUT base inválido');
+      return;
+    }
+
+    const { dv, suma, resto, detalle } = calcularDV(base);
+
+    // Mostrar card
+    card.className = 'resultado-card visible';
+
+    // Estado
+    let esValido = null;
+    if (dvIngresado !== null) {
+      esValido = dvIngresado === dv;
+    }
+
+    const icon = document.getElementById('resIcon');
+    const status = document.getElementById('resStatus');
+    const rutDisplay = document.getElementById('rutDisplay');
+    const rutSub = document.getElementById('rutSub');
+
+    if (esValido === true) {
+      card.classList.add('valido');
+      card.classList.remove('invalido');
+      icon.className = 'res-icon ok';
+      icon.textContent = '✓';
+      status.className = 'res-status ok';
+      status.textContent = 'RUT válido';
+      rutDisplay.innerHTML = `${formatRUT(base)}-<span class="dv-ok">${dv}</span>`;
+      rutSub.textContent = 'Dígito verificador correcto';
+    } else if (esValido === false) {
+      card.classList.add('invalido');
+      card.classList.remove('valido');
+      icon.className = 'res-icon err';
+      icon.textContent = '✗';
+      status.className = 'res-status err';
+      status.textContent = 'RUT inválido';
+      rutDisplay.innerHTML = `${formatRUT(base)}-<span class="dv-err">${dvIngresado}</span>`;
+      rutSub.textContent = `El DV correcto sería: ${dv}`;
+    } else {
+      card.classList.remove('valido', 'invalido');
+      icon.className = 'res-icon ok';
+      icon.textContent = '→';
+      status.className = 'res-status';
+      status.style.color = 'var(--accent)';
+      status.textContent = 'DV calculado';
+      rutDisplay.innerHTML = `${formatRUT(base)}-<span class="dv-neu">${dv}</span>`;
+      rutSub.textContent = 'Ingresa con DV para validar';
+    }
+
+    // Desglose
+    document.getElementById('dBase').textContent = formatRUT(base);
+    document.getElementById('dCalc').className = 'dval ' + (esValido === false ? 'dv-incorrecto' : 'dv-correcto');
+    document.getElementById('dCalc').textContent = dv;
+
+    const dvIngEl = document.getElementById('dIngresado');
+    if (dvIngresado !== null) {
+      dvIngEl.textContent = dvIngresado;
+      dvIngEl.className = 'dval ' + (esValido ? 'dv-correcto' : 'dv-incorrecto');
+    } else {
+      dvIngEl.textContent = '—';
+      dvIngEl.className = 'dval';
+    }
+
+    document.getElementById('dSuma').textContent = suma;
+    document.getElementById('dResto').textContent = `${suma} % 11 = ${resto}`;
+
+    // Fórmula
+    document.getElementById('formulaBox').innerHTML = `
+      <div class="fline">Dígitos invertidos × secuencia [2…7]:</div>
+      <div class="facent">${detalle.join('  +  ')}</div>
+      <div class="fline" style="margin-top:6px">Suma: ${suma} → ${suma} % 11 = ${resto} → 11 − ${resto} = ${11 - resto}</div>
+      <div class="facent">DV = <strong>${dv}</strong></div>
+    `;
+
+    card.classList.add('pulse');
+    setTimeout(() => card.classList.remove('pulse'), 300);
+
+    // Consultar SII
+    consultarSII(base, dv);
+
+    // Actualizar links externos
+    actualizarLinks(base, dv);
+  }
+
+  function actualizarLinks(base, dv) {
+    const rutCompleto = `${base}-${dv}`;
+    const rutSinGuion = `${base}${dv}`;
+
+    const links = {
+      'lnk-buscarut':      `https://buscarut.com/?rut=${base}-${dv}`,
+      'lnk-rutrutificadr': `https://rutrutificadr.cl/?rut=${base}-${dv}`,
+      'lnk-nombrerut':     `https://www.nombrerutyfirma.com/?rut=${base}-${dv}`,
+      'lnk-servel':        `https://consulta.servel.cl/?rut=${base}`,
+      'lnk-fonasa1':       `https://sigdp.dpp.cl/FonasaCliente/`,
+      'lnk-fonasa2':       `https://nuevo.fonasa.gob.cl/certificado-rut-provisorio/`,
+      'lnk-fonasa3':       `https://adjuntos.fonasa.gob.cl/sites/fonasa/beneficiarios/tramites/certificado-rut-previsional;jsessionid=DAhbzxZmmLpkIOh1F3TY-zNhwOBPc9wc9209FSUkVwu8KjLSndwI!92688140!-681730996:ZZvWSNfNR-NcD0pymz0PHps+c1F5aVht`,
+      'lnk-spensiones':    `https://www.spensiones.cl/apps/certificados/formConsultaAfiliacion.php`,
+      'lnk-ibero':         `https://iberocapital.cl/consulta-sii?rut=${base}-${dv}`,
+      'lnk-roles':         `https://www4.sii.cl/busquedarolesinternetui/#!/busquedaroles`,
+      'lnk-mapas':         `https://www4.sii.cl/mapasui/internet/#/contenido/index.html`,
+      'lnk-patente':       `https://www.patentechile.com`,
+      'lnk-volantemaleta': `https://www.volanteomaleta.com`,
+      'lnk-alertavehiculo':`https://alertavehiculo.cl`,
+      'lnk-rrvv':          `http://rrvv.fiscalizacion.cl/MTTVias2019/`,
+      'lnk-revision':      `https://www.prt.cl/Paginas/RevisionTecnica.aspx`,
+      'lnk-multas':        `http://consultamultas.srcei.cl/ConsultaMultas/consultaMultasExterna.do`,
+      'lnk-licencia':      `http://registrocivil.cl/bloqueo/runLicencia.jsp?accion=C`,
+      'lnk-tag':           `https://pasastesintag.cl`,
+    };
+
+    Object.entries(links).forEach(([id, url]) => {
+      const el = document.getElementById(id);
+      if (el) el.href = url;
+    });
+
+    document.getElementById('linksCard').className = 'links-card visible';
+  }
+
+  async function consultarSII(base, dv) {
+    const siiCard     = document.getElementById('siiCard');
+    const siiLoading  = document.getElementById('siiLoading');
+    const siiResult   = document.getElementById('siiResultado');
+    const siiError    = document.getElementById('siiError');
+    const fallbackBtn = document.getElementById('siiFallbackBtn');
+
+    // URL directa al formulario del SII con RUT precargado
+    const siiUrl = `https://www2.sii.cl/stc/STC/STCConSuViRutAction.do?RUT=${base}&DV=${dv}&PRG=STC&OPC=NOR`;
+    fallbackBtn.href = siiUrl;
+
+    // Reset estado
+    siiCard.className = 'sii-card visible';
+    siiLoading.style.display = 'flex';
+    siiResult.className = 'sii-resultado';
+    siiError.className = 'sii-error';
+
+    try {
+      const resp = await fetch(siiUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'omit',
+      });
+
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+
+      const html = await resp.text();
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(html, 'text/html');
+
+      // Intentar extraer datos de la tabla del SII
+      const rows = doc.querySelectorAll('table tr');
+      let nombre = null, actividad = null, inicio = null, situacion = null;
+
+      rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        if (cells.length >= 2) {
+          const label = cells[0].textContent.trim().toLowerCase();
+          const val   = cells[1].textContent.trim();
+          if (label.includes('nombre') || label.includes('razón'))    nombre    = val;
+          if (label.includes('actividad') || label.includes('giro'))  actividad = val;
+          if (label.includes('inicio'))                                inicio    = val;
+          if (label.includes('situaci'))                               situacion = val;
+        }
+      });
+
+      // Si no encontramos nada útil en el HTML, es probable que haya redirigido
+      if (!nombre && !actividad) throw new Error('sin_datos');
+
+      siiLoading.style.display = 'none';
+      document.getElementById('siiNombre').textContent    = nombre    || '—';
+      document.getElementById('siiActividad').textContent = actividad || '—';
+      document.getElementById('siiInicio').textContent    = inicio    || '—';
+      document.getElementById('siiSituacion').textContent = situacion || '—';
+      siiResult.className = 'sii-resultado visible';
+
+    } catch (err) {
+      siiLoading.style.display = 'none';
+      if (err.message === 'sin_datos') {
+        document.getElementById('siiErrorMsg').textContent =
+          'El SII respondió pero no se pudo leer el contenido. Consulta directamente:';
+      } else {
+        document.getElementById('siiErrorMsg').innerHTML =
+          'El SII bloquea consultas directas desde apps externas (CORS).<br>Abre el sitio oficial con el RUT ya ingresado:';
+      }
+      siiError.className = 'sii-error visible';
+    }
+  }
+
+  function shake() {
+    const inp = document.getElementById('rutInput');
+    inp.style.borderColor = 'var(--red)';
+    inp.style.animation = 'none';
+    setTimeout(() => {
+      inp.style.animation = '';
+      inp.style.borderColor = '';
+    }, 600);
+  }
+
+  function mostrarError(msg) {
+    const card = document.getElementById('resultadoCard');
+    card.className = 'resultado-card visible invalido';
+    document.getElementById('resIcon').className = 'res-icon err';
+    document.getElementById('resIcon').textContent = '✗';
+    document.getElementById('resStatus').className = 'res-status err';
+    document.getElementById('resStatus').textContent = msg;
+    document.getElementById('rutDisplay').innerHTML = '—';
+    document.getElementById('rutSub').textContent = '';
+    document.getElementById('dBase').textContent = '—';
+    document.getElementById('dCalc').textContent = '—';
+    document.getElementById('dIngresado').textContent = '—';
+    document.getElementById('dSuma').textContent = '—';
+    document.getElementById('dResto').textContent = '—';
+    document.getElementById('formulaBox').innerHTML = '';
+  }
+</script>
+
+</body>
+</html>
